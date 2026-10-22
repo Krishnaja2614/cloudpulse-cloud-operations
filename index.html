@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="CloudPulse cloud operations dashboard demo with service health, deployments, and incidents.">
+  <title>CloudPulse | Cloud Operations</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/app.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="#dashboard" aria-label="CloudPulse home">
+        <span class="brand-mark" aria-hidden="true">☁</span>
+        <span><strong>CloudPulse</strong><small>Cloud Operations Dashboard</small></span>
+      </a>
+      <nav class="main-nav" aria-label="Main navigation">
+        <button class="nav-item active" data-view="dashboard"><span>⌂</span>Dashboard</button>
+        <button class="nav-item" data-view="services"><span>⬡</span>Services</button>
+        <button class="nav-item" data-view="deployments"><span>↗</span>Deployments</button>
+        <button class="nav-item" data-view="incidents"><span>⚠</span>Incidents</button>
+        <button class="nav-item" data-view="monitoring"><span>⌁</span>Monitoring</button>
+        <button class="nav-item" data-view="settings"><span>⚙</span>Settings</button>
+      </nav>
+      <div class="sidebar-bottom">
+        <span class="online-dot"></span><span>System Online</span>
+        <small>Demo environment · Local data</small>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <button class="mobile-menu" id="mobileMenu" aria-label="Toggle navigation">☰</button>
+        <label class="search-wrap">
+          <span aria-hidden="true">⌕</span>
+          <input id="globalSearch" type="search" placeholder="Search services, incidents, deployments..." aria-label="Search dashboard">
+          <kbd>Ctrl K</kbd>
+        </label>
+        <div class="topbar-user"><span class="notification" aria-label="Notifications">♧<i></i></span><span class="avatar">CP</span><span class="user-name">Cloud Operator</span><span class="chevron">⌄</span></div>
+      </header>
+
+      <section class="page" id="dashboardView">
+        <div class="page-heading">
+          <div><p class="eyebrow">CLOUD OPERATIONS / OVERVIEW</p><h1>Good to see you, Operator.</h1><p class="subtitle">Here’s what’s happening with your cloud environment.</p></div>
+          <div class="date-chip"><span>▦</span><div><strong id="todayDate">Today</strong><small>Demo environment</small></div></div>
+        </div>
+
+        <div class="metric-grid">
+          <article class="metric-card metric-green"><div class="metric-top"><span class="metric-icon">✓</span><span class="metric-tag">LIVE DEMO</span></div><p>Healthy Services</p><div class="metric-value" id="healthyCount">5 <small>/ 7</small></div><small class="metric-note">Services operating normally</small></article>
+          <article class="metric-card metric-blue"><div class="metric-top"><span class="metric-icon">◷</span><span class="metric-tag">7 DAYS</span></div><p>Overall Uptime</p><div class="metric-value">99.8%</div><small class="metric-note positive">↑ 0.2% <span>vs. previous period</span></small></article>
+          <article class="metric-card metric-purple"><div class="metric-top"><span class="metric-icon">ϟ</span><span class="metric-tag">AVERAGE</span></div><p>Response Time</p><div class="metric-value">186 <small>ms</small></div><small class="metric-note positive">↓ 12% <span>vs. previous period</span></small></article>
+          <article class="metric-card metric-orange"><div class="metric-top"><span class="metric-icon">!</span><span class="metric-tag">NEEDS REVIEW</span></div><p>Open Incidents</p><div class="metric-value" id="openIncidentCount">1</div><small class="metric-note">Review critical alerts</small></article>
+        </div>
+
+        <div class="content-grid">
+          <section class="panel service-panel" id="servicePanel">
+            <div class="panel-heading"><div class="panel-title"><span class="panel-icon">⌁</span><div><h2>Service Health</h2><p>Current component status</p></div></div><div class="legend"><span><i class="dot healthy"></i>Healthy</span><span><i class="dot warning"></i>Warning</span><span><i class="dot critical"></i>Critical</span></div></div>
+            <div class="service-list" id="serviceList"></div>
+            <p class="panel-footnote">Illustrative status values · not connected to AWS</p>
+          </section>
+
+          <section class="panel chart-panel" id="monitoringPanel">
+            <div class="panel-heading"><div class="panel-title"><span class="panel-icon">⌗</span><div><h2>Uptime &amp; Response Time</h2><p>Performance overview</p></div></div><div class="segmented" role="group" aria-label="Chart time range"><button data-range="24h">24h</button><button class="selected" data-range="7d">7d</button><button data-range="30d">30d</button></div></div>
+            <div class="chart-legend"><span><i class="legend-line uptime-line"></i>Uptime</span><span><i class="legend-line response-line"></i>Response time</span></div>
+            <div class="chart-area"><div class="y-labels"><span>100%</span><span>99%</span><span>98%</span><span>97%</span><span>96%</span></div><svg class="chart" viewBox="0 0 600 250" role="img" aria-label="Illustrative uptime and response time chart"><defs><linearGradient id="uptimeFill" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#3989ff" stop-opacity=".30"/><stop offset="1" stop-color="#3989ff" stop-opacity="0"/></linearGradient></defs><g class="grid-lines"><path d="M25 20H580 M25 70H580 M25 120H580 M25 170H580 M25 220H580"/></g><path id="uptimeArea" d="M25 48 L115 44 L205 49 L295 45 L385 47 L475 39 L580 36 L580 220 L25 220Z" fill="url(#uptimeFill)"/><path id="uptimePath" d="M25 48 L115 44 L205 49 L295 45 L385 47 L475 39 L580 36" class="line-blue"/><path id="responsePath" d="M25 145 L115 160 L205 183 L295 164 L385 177 L475 170 L580 174" class="line-purple"/><g id="chartPoints" class="chart-points"><circle cx="25" cy="48" r="4"/><circle cx="115" cy="44" r="4"/><circle cx="205" cy="49" r="4"/><circle cx="295" cy="45" r="4"/><circle cx="385" cy="47" r="4"/><circle cx="475" cy="39" r="4"/><circle cx="580" cy="36" r="4"/></g></svg><div class="x-labels" id="xLabels"><span>Oct 17</span><span>Oct 18</span><span>Oct 19</span><span>Oct 20</span><span>Oct 21</span><span>Oct 22</span><span>Oct 23</span></div></div>
+          </section>
+
+          <section class="panel table-panel" id="deploymentPanel">
+            <div class="panel-heading"><div class="panel-title"><span class="panel-icon">↗</span><div><h2>Recent Deployments</h2><p>Latest release activity</p></div></div><button class="text-button" data-view="deployments">View all <span>→</span></button></div>
+            <div class="table-scroll"><table><thead><tr><th>Version</th><th>Branch</th><th>Status</th><th>Deployed at</th></tr></thead><tbody id="deploymentRows"></tbody></table></div>
+          </section>
+
+          <section class="panel table-panel" id="incidentPanel">
+            <div class="panel-heading"><div class="panel-title"><span class="panel-icon alert-icon">!</span><div><h2>Recent Incidents</h2><p>Track and resolve issues</p></div></div><button class="text-button" data-view="incidents">View all <span>→</span></button></div>
+            <div class="table-scroll"><table><thead><tr><th>ID</th><th>Service</th><th>Severity</th><th>Status</th><th>Time</th><th></th></tr></thead><tbody id="incidentRows"></tbody></table></div>
+          </section>
+        </div>
+
+        <div class="demo-banner"><span class="banner-cloud">☁</span><div><strong>This dashboard uses simulated data</strong><p>Connect AWS CloudWatch, CloudTrail, and deployment events to build a live monitoring solution.</p></div><button id="architectureBtn" class="primary-button">View Architecture <span>↗</span></button></div>
+        <footer>CloudPulse Portfolio Project <span>•</span> Demo data only <span>•</span> Built to practise cloud operations &amp; CI/CD</footer>
+      </section>
+
+      <section class="page secondary-page hidden" id="secondaryView">
+        <div class="page-heading"><div><p class="eyebrow">CLOUD OPERATIONS / WORKSPACE</p><h1 id="secondaryTitle">Services</h1><p class="subtitle" id="secondarySubtitle">Explore your cloud environment.</p></div><button class="secondary-button" id="backDashboard">← Back to dashboard</button></div>
+        <div class="panel secondary-panel" id="secondaryContent"></div>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="architectureDialog" class="architecture-dialog">
+    <form method="dialog"><button class="dialog-close" aria-label="Close dialog">×</button></form>
+    <p class="eyebrow">REFERENCE ARCHITECTURE</p><h2>CloudPulse CI/CD on AWS</h2>
+    <p class="dialog-intro">A proposed architecture for a future live deployment. This demo does not create AWS resources or make API calls.</p>
+    <div class="architecture-flow">
+      <div><span>01</span><strong>GitHub</strong><small>Source control</small></div><b>→</b>
+      <div><span>02</span><strong>GitHub Actions</strong><small>Test &amp; package</small></div><b>→</b>
+      <div><span>03</span><strong>Amazon S3</strong><small>Static website</small></div>
+    </div>
+    <div class="architecture-note"><strong>Production extensions</strong><p>Use least-privilege IAM via GitHub OIDC, add CloudFront only after reviewing cost, and use CloudWatch/CloudTrail for appropriate monitoring and audit trails.</p></div>
+    <button class="primary-button dialog-done" id="closeArchitecture">Got it</button>
+  </dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
