@@ -175,25 +175,8 @@ function renderSecondary(view) {
         `).join("")}
       </div>`;
   } else if (view === "incidents") {
-    content.innerHTML = `
-      <h2>Incident register</h2>
-      <p class="subtitle">Use Resolve to update this page's in-memory demo state.</p>
-      <div class="secondary-list">
-        ${incidents.map(i => `
-          <div class="secondary-list-item">
-            <div>
-              <strong>${escapeHTML(i.id)} · ${escapeHTML(i.service)}</strong>
-              <small>${escapeHTML(i.severity)} severity · ${escapeHTML(i.time)}</small>
-            </div>
-            <div class="incident-controls">
-              <span class="status-pill ${i.status === "Resolved" ? "status-resolved" : "status-critical"}">${escapeHTML(i.status)}</span>
-              ${i.status === "Open"
-                ? `<button type="button" class="incident-action" data-resolve="${escapeHTML(i.id)}">Resolve</button>`
-                : ""}
-            </div>
-          </div>
-        `).join("")}
-      </div>`;
+    content.innerHTML = ` <h2>Incident register</h2> <p class="subtitle"> Investigate incidents, review simulated monitoring evidence, and resolve issues when ready. </p> <div class="secondary-list"> ${incidents.map(i => ` <div class="secondary-list-item"> <div> <strong>${escapeHTML(i.id)} · ${escapeHTML(i.service)}</strong> <small> ${escapeHTML(i.severity)} severity · ${escapeHTML(i.time)} </small> </div> <div class="incident-controls"> <span class="status-pill ${ i.status === "Resolved" ? "status-resolved" : "status-critical" }">${escapeHTML(i.status)}</span> <button type="button" class="incident-action" data-investigate="${escapeHTML(i.id)}" >Investigate</button> ${i.status === "Open" ? `<button type="button" class="incident-action" data-resolve="${escapeHTML(i.id)}" >Resolve</button>` : ""} </div> </div> `).join("")} </div> <div id="incidentInvestigation" class="investigation-panel"> <h3>Incident investigation</h3> <p>Select <strong>Investigate</strong> beside an incident to begin.</p> </div> `;
+    
   } else if (view === "monitoring") {
     content.innerHTML = `
       <h2>Monitoring overview</h2>
@@ -333,6 +316,128 @@ function init() {
 
   $("#incidentRows").addEventListener("click", handleResolveClick);
   $("#secondaryContent").addEventListener("click", handleResolveClick);
+  $("#secondaryContent").addEventListener("click", event => {
+  const button = event.target.closest("[data-investigate]");
+  if (!button) return;
+
+  const incident = incidents.find(
+    i => i.id === button.dataset.investigate
+  );
+  if (!incident) return;
+
+  const panel = $("#incidentInvestigation");
+
+  const investigations = {
+    "INC-1005": {
+      symptom: "Monitoring alerts are not being processed.",
+      impact: "Monitoring visibility may be reduced.",
+      evidence: "Simulated alert-processing errors detected.",
+      cause: "Possible monitoring service or configuration issue.",
+      steps: [
+        "Check the monitoring service health.",
+        "Review recent configuration changes.",
+        "Inspect application and system logs.",
+        "Verify alert delivery and notification settings."
+      ],
+      fix: "Validate the configuration, correct any identified errors, and retest alert delivery."
+    }
+  };
+
+  const details = investigations[incident.id] || {
+    symptom: `${incident.service} requires investigation.`,
+    impact: "The impact has not yet been confirmed.",
+    evidence: "No additional monitoring evidence is available in this demo.",
+    cause: "Root cause has not yet been identified.",
+    steps: [
+      "Confirm the reported symptoms.",
+      "Check service health and availability.",
+      "Review relevant logs and recent changes.",
+      "Test the service after any corrective action."
+    ],
+    fix: "Document the verified root cause and the corrective action taken."
+  };
+
+  
+panel.innerHTML = `
+  <h3>Investigation: ${escapeHTML(incident.id)}</h3>
+
+  <p><strong>Service:</strong> ${escapeHTML(incident.service)}</p>
+  <p><strong>Severity:</strong> ${escapeHTML(incident.severity)}</p>
+  <p><strong>Current status:</strong> ${escapeHTML(incident.status)}</p>
+  <p><strong>Symptoms:</strong> ${escapeHTML(details.symptom)}</p>
+  <p><strong>Impact:</strong> ${escapeHTML(details.impact)}</p>
+  <p><strong>Monitoring evidence:</strong> ${escapeHTML(details.evidence)}</p>
+  <p><strong>Possible cause:</strong> ${escapeHTML(details.cause)}</p>
+
+  <h4>Troubleshooting checklist</h4>
+
+  <div class="investigation-checklist">
+    ${details.steps.map((step, index) => `
+      <label class="investigation-step">
+        <input
+          type="checkbox"
+          class="investigation-checkbox"
+          data-step-index="${index}"
+        >
+        <span>${escapeHTML(step)}</span>
+      </label>
+    `).join("")}
+  </div>
+
+  <div class="investigation-progress">
+    <div class="investigation-progress-heading">
+      <strong>Investigation progress</strong>
+      <span id="investigationProgressText">0/${details.steps.length} completed</span>
+    </div>
+
+    <div
+      class="investigation-progress-track"
+      role="progressbar"
+      aria-label="Troubleshooting progress"
+      aria-valuemin="0"
+      aria-valuemax="${details.steps.length}"
+      aria-valuenow="0"
+    >
+      <div
+        id="investigationProgressBar"
+        class="investigation-progress-bar"
+        style="width: 0%"
+      ></div>
+    </div>
+  </div>
+
+  <h4>Recommended corrective action</h4>
+  <p>${escapeHTML(details.fix)}</p>
+
+  <p class="subtitle">
+    Training scenario only — evidence and root cause are simulated.
+  </p>
+`;
+
+const checklist = panel.querySelector(".investigation-checklist");
+const checkboxes = checklist.querySelectorAll(
+  ".investigation-checkbox"
+);
+const progressText = panel.querySelector("#investigationProgressText");
+const progressBar = panel.querySelector("#investigationProgressBar");
+const progressTrack = panel.querySelector(".investigation-progress-track");
+
+function updateInvestigationProgress() {
+  const completed = [...checkboxes].filter(box => box.checked).length;
+  const total = checkboxes.length;
+  const percentage = total === 0 ? 0 : (completed / total) * 100;
+
+  progressText.textContent = `${completed}/${total} completed`;
+  progressBar.style.width = `${percentage}%`;
+  progressTrack.setAttribute("aria-valuenow", completed);
+}
+
+checkboxes.forEach(checkbox => {
+  checkbox.addEventListener("change", updateInvestigationProgress);
+});
+
+updateInvestigationProgress();
+});
 
   $("#architectureBtn").addEventListener("click", () =>
     $("#architectureDialog").showModal()
