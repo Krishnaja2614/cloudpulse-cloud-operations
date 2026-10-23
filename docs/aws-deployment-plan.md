@@ -21,3 +21,8 @@ Host CloudPulse on AWS with automated CI/CD.
 - GitHub repository: Available
 - CI validation: Passing
 - AWS deployment: Pending cost and account eligibility verification
+## Deployment Blockers
+- GitHub OIDC provider setup is unavailable in the current AWS console.
+- No IAM deployment role has been created.
+- No CloudFront distribution has been created.
+- Deployment remains disabled until secure authentication and zero-cost hosting eligibility are verified.
