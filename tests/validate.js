@@ -54,8 +54,13 @@ console.log(`PASS: index.html includes ${expected}`);
 }
 }
 }
-
-// 4. Check that JavaScript has valid syntax.
+// 4. Check that incident investigation features are present.
+if (js !== null) { 
+    const expectedFeatures = [ "data-investigate", "data-resolve", "incidentInvestigation", "investigation-checkbox", "updateInvestigationProgress", "investigationProgressBar" ]; 
+    for (const feature of expectedFeatures) { if (!js.includes(feature)) { console.error( `FAIL: js/app.js is missing incident feature: ${feature}` ); failed = true; 
+} else {
+     console.log(`PASS: js/app.js includes ${feature}`); } } }
+// 5. Check that JavaScript has valid syntax.
 if (js !== null) {
 try {
 new Function(js);
@@ -66,7 +71,7 @@ failed = true;
 }
 }
 
-// 5. Report the final result.
+// 6. Report the final result.
 if (failed) {
 console.error("\nCloudPulse validation failed. Review the errors above.");
 process.exit(1);
